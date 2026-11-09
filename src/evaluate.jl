@@ -23,15 +23,18 @@ function evaluate(
     expr::Any,
     symboltable::SymbolTable;
     shortcircuit::Bool=true,
-    allow_evaluation_errors::Bool=false
+    allow_evaluation_errors::Bool=false,
+    allow_noise::Number=0,
 )::Number
     number_of_satisfied_examples = 0
-    println("dev branch")
+    
     crashed = false
     for example ∈ problem.spec
         try
             output = execute_on_input(symboltable, expr, example.in)
             if (output == example.out)
+                number_of_satisfied_examples += 1
+            elseif isa(output, Number) && (abs(output-example.out) < allow_noise)
                 number_of_satisfied_examples += 1
             elseif (shortcircuit)
                 break;
