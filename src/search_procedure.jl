@@ -28,6 +28,7 @@ function synth(
 	iterator::ProgramIterator;
 	shortcircuit::Bool = true,
 	allow_evaluation_errors::Bool = false,
+	allow_noise::Number = 0,
 	max_time = typemax(Int),
 	max_enumerations = typemax(Int),
 	mod::Module = Main)::Union{Tuple{RuleNode, SynthResult}, Nothing}
@@ -49,10 +50,11 @@ function synth(
 			symboltable,
 			shortcircuit = shortcircuit,
 			allow_evaluation_errors = allow_evaluation_errors,
+			allow_noise = allow_noise
 		)
 		if score == 1
 			candidate_program = freeze_state(candidate_program)
-			return (candidate_program, optimal_program)
+			return (candidate_program, optimal_program, score)
 		elseif score >= best_score
 			best_score = score
 			candidate_program = freeze_state(candidate_program)
@@ -66,5 +68,5 @@ function synth(
 	end
 
 	# The enumeration exhausted, but an optimal problem was not found
-	return (best_program, suboptimal_program)
+	return (best_program, suboptimal_program, best_score)
 end
